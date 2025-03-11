@@ -5,6 +5,10 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>PatTool</ToolCommandName>
+    <PackageOutputPath>./nupkg</PackageOutputPath>
+    <Version>0.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>

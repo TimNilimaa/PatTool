@@ -5,10 +5,10 @@ using Microsoft.Extensions.Logging;
 using PatTool.Exceptions;
 using PatTool.Helpers;
 
-string azureDevOpsResourceId = "499b84ac-1321-427f-aa17-267ca6975798"; //Azure DevOps
+const string azureDevOpsResourceId = "499b84ac-1321-427f-aa17-267ca6975798"; //Azure DevOps
 
 using var serviceProvider = new ServiceCollection()
-            .AddLogging(config => config.AddConsole()) // Log to console
+            .AddLogging(config => config.AddConsole())
             .BuildServiceProvider();
 
 var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
@@ -21,37 +21,31 @@ if (!Validators.IsAzureCliInstalled())
 
 if (!Validators.IsAzureCliLoggedIn())
 {
-    logger.LogError("You must be logged in to Azure CLI first. Run: az login --use-device-code");
+    logger.LogError("You must be logged in to Azure CLI first. Run: az login");
     return;
 }
 
 string? organization = Environment.GetEnvironmentVariable("ADO_PatTool_Org");
 
-// Ensure the required environment variable is set
 if (string.IsNullOrEmpty(organization))
 {
     logger.LogError("Environment variables ADO_PatTool_Org must be set.");
     return;
 }
 
-// Default expiration time (1 day)
 int daysUntilExpiry = 1;
 
-// Try to fetch expiration days from environment variable ADO_PatTool_TTL
 string? ttlEnvVar = Environment.GetEnvironmentVariable("ADO_PatTool_TTL");
 if (!string.IsNullOrEmpty(ttlEnvVar) && int.TryParse(ttlEnvVar, out int ttlFromEnv))
 {
     daysUntilExpiry = ttlFromEnv;
 }
 
-// Print the configuration
 logger.LogDebug("Using Organization: {Organization}", organization);
 logger.LogDebug("Token will expire in {DaysUntilExpiry} day(s).", daysUntilExpiry);
 
-// Get the access token using Azure CLI
 string token = await GetAccessToken(azureDevOpsResourceId);
 
-// Prepare headers for the API request
 var headers = new Dictionary<string, string>
 {
     { "Authorization", "Bearer " + token },
@@ -59,13 +53,11 @@ var headers = new Dictionary<string, string>
 
 string pipelineRunUrl = $"https://vssps.dev.azure.com/{organization}/_apis/tokens/pats?api-version=7.2-preview.1";
 
-// Call the Azure DevOps API
 var adoToken = await CallAzureDevOpsApi(pipelineRunUrl, headers, daysUntilExpiry);
 
 logger.LogTrace("Your token has been generated");
 Console.WriteLine(adoToken);
 
-// Method to get the access token using Azure CLI
 static async Task<string> GetAccessToken(string azureDevOpsResourceId)
 {
     var processStartInfo = new System.Diagnostics.ProcessStartInfo
@@ -86,7 +78,6 @@ static async Task<string> GetAccessToken(string azureDevOpsResourceId)
 
 
 
-// Method to make the GET request to the Azure DevOps API
 static async Task<string> CallAzureDevOpsApi(string url, Dictionary<string, string> headers, int daysUntilExpiry)
 {
     using var client = new HttpClient();
