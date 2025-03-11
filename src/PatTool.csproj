@@ -8,9 +8,15 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>PatTool</ToolCommandName>
     <PackageOutputPath>./nupkg</PackageOutputPath>
-    <Version>0.0.2</Version>
+    <Version>0.0.3</Version>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="../README.md" Pack="true" PackagePath=""/>
+  </ItemGroup>
+  
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.0" />
